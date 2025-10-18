@@ -29,7 +29,6 @@ let lastStderr: string[] = []
 
 // Load OpenSCAD script via classic worker importScripts to avoid bundler dynamic import issues
 async function getOpenScad() {
-  try { console.log('[OpenSCAD Worker] getOpenScad start, baseOrigin=', baseOrigin) } catch {}
   const origin = baseOrigin || ''
   const jsUrl = `${origin}/api/assets/openscad-js`
   const wasmUrl = `${origin}/api/assets/openscad-wasm`
@@ -45,14 +44,12 @@ async function getOpenScad() {
     const blob = new Blob([patchedSrc], { type: 'application/javascript' })
     const blobUrl = URL.createObjectURL(blob)
     ;(self as any).importScripts(blobUrl)
-    try { console.log('[OpenSCAD Worker] importScripts ok via blob:', jsUrl) } catch {}
   } catch (e) {
     try { console.error('[OpenSCAD Worker] importScripts failed:', jsUrl, e) } catch {}
     throw e
   }
   const factory = (self as any).OpenSCAD
   if (typeof factory !== 'function') throw new Error('OpenSCAD factory not found')
-  try { console.log('[OpenSCAD Worker] factory located') } catch {}
   const stderrBuffer: string[] = []
   const stdoutBuffer: string[] = []
   lastStdout = stdoutBuffer
@@ -60,7 +57,6 @@ async function getOpenScad() {
   const instance = factory({
     locateFile: (p: string, prefix: string) => (p.endsWith('.wasm') ? wasmUrl : prefix + p),
     print: (text: string) => {
-      try { console.log('[OpenSCAD stdout]', text) } catch {}
       stdoutBuffer.push(text)
       lastStdout = stdoutBuffer
     },
@@ -75,7 +71,6 @@ async function getOpenScad() {
   try { await (instance as any).ready } catch {}
   ;(instance as any)._stderrBuffer = stderrBuffer
   ;(instance as any)._stdoutBuffer = stdoutBuffer
-  try { console.log('[OpenSCAD Worker] instance ready') } catch {}
   return instance as {
     FS: {
       writeFile: (p: string, d: string | Uint8Array) => void
@@ -140,7 +135,6 @@ async function handleCompile(msg: CompileRequest): Promise<CompileResponse> {
     // Unique output per request to avoid collisions across concurrent runs
     const output = `/work/out-${msg.id}.stl`
     instance.FS.writeFile(input, msg.scad || '')
-    try { console.log('[OpenSCAD Worker] compile request', { id: msg.id, scadLen: (msg.scad || '').length, params: Object.keys(msg.params || {}).length }) } catch {}
 
     const defineFlags: string[] = []
     if (msg.params) {
@@ -176,7 +170,6 @@ async function handleCompile(msg: CompileRequest): Promise<CompileResponse> {
       if (fontResp.ok) {
         const fontBuf = new Uint8Array(await fontResp.arrayBuffer())
         instance.FS.writeFile('/fonts/arial.ttf', fontBuf)
-        try { console.log('[OpenSCAD Worker] Mounted font', fontUrl) } catch {}
       } else {
         try { console.warn('[OpenSCAD Worker] Font fetch not ok', { url: fontUrl, status: fontResp.status }) } catch {}
       }
@@ -199,7 +192,6 @@ async function handleCompile(msg: CompileRequest): Promise<CompileResponse> {
     const args = ['-o', output, '--export-format', 'binstl', input, ...defineFlags]
 
     const code = instance.callMain(args)
-    try { console.log('[OpenSCAD Worker] callMain exit code', code) } catch {}
 
     let data: Uint8Array | null = null
     try {
@@ -291,11 +283,9 @@ self.onmessage = async (ev: MessageEvent<CompileRequest>) => {
   if (!req) return
   if (req.type === 'init' && typeof req.origin === 'string') {
     baseOrigin = req.origin
-    try { console.log('[OpenSCAD Worker] init received, origin=', baseOrigin) } catch {}
     return
   }
   if (req.type !== 'compile') return
-  try { console.log('[OpenSCAD Worker] message compile received', { id: req.id }) } catch {}
   const res = await handleCompile(req)
   // Transfer the underlying ArrayBuffer when possible
   if (res.ok) {

@@ -8,15 +8,11 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url)
     const softwareId = searchParams.get('softwareId')
     const userId = searchParams.get('userId')
-    console.log(`[MESSAGES] Messages request - User: ${userId}, Software: ${softwareId}`)
-
     if (!softwareId || !userId) {
-      console.log(`[MESSAGES] Request failed - Missing required parameters`)
       return NextResponse.json({ error: 'Software ID and User ID are required' }, { status: 400 })
     }
 
     // Verify software ownership
-    console.log(`[MESSAGES] Verifying software ownership for software: ${softwareId}`)
     const { data: software, error: softwareError } = await supabase
       .from('software')
       .select(`
@@ -28,14 +24,11 @@ export async function GET(request: NextRequest) {
       .single()
 
     if (softwareError || !software) {
-      console.log(`[MESSAGES] Software verification failed:`, softwareError?.message)
       return NextResponse.json({ error: 'Software not found' }, { status: 404 })
     }
 
-    console.log(`[MESSAGES] Software verified - Title: ${software.title}`)
 
     // Get messages for this software
-    console.log(`[MESSAGES] Loading messages for software: ${softwareId}`)
     const { data: messages, error: messagesError } = await supabase
       .from('software_messages')
       .select('id, role, content, created_at')
@@ -43,11 +36,9 @@ export async function GET(request: NextRequest) {
       .order('created_at', { ascending: false })
 
     if (messagesError) {
-      console.log(`[MESSAGES] Failed to load messages:`, messagesError)
       return NextResponse.json({ error: 'Failed to load messages' }, { status: 500 })
     }
 
-    console.log(`[MESSAGES] Messages loaded: ${messages?.length || 0} items`)
 
     return NextResponse.json({
       software: {

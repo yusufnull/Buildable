@@ -530,7 +530,6 @@ export function HardwareViewer({ creation, onRegenerate, onGenerateComponentMode
 
       if (response.ok) {
         const result = await response.json()
-        console.log(`Regenerated ${tabId}:`, result)
         window.location.reload()
       } else {
         console.error(`Failed to regenerate ${tabId}`)

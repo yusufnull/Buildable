@@ -17,7 +17,6 @@ export async function generateText({
   maxTokens?: number
 }) {
   try {
-    console.log(`[OPENAI] Calling OpenAI API with model: ${model}`)
 
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
@@ -43,7 +42,6 @@ export async function generateText({
     }
 
     const data = await response.json()
-    console.log(`[OPENAI] Successfully generated response with ${data.usage?.total_tokens || 0} tokens`)
 
     return { text: data.choices[0].message.content }
   } catch (error: any) {

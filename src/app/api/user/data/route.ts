@@ -8,32 +8,24 @@ export async function GET(request: NextRequest) {
     // Get user ID from query parameters
     const { searchParams } = new URL(request.url)
     const userId = searchParams.get('userId')
-    console.log(`[USER_DATA] Data request for user: ${userId}`)
-    
     if (!userId) {
-      console.log(`[USER_DATA] Request failed - User ID missing`)
       return NextResponse.json({ error: 'User ID is required' }, { status: 400 })
     }
 
     // Get user's project data
-    console.log(`[USER_DATA] Loading project data for user: ${userId}`)
     const { data: projectData } = await supabase
       .from('projects')
       .select('id, name, description, v0_id')
       .eq('owner_id', userId)
       .single()
 
-    console.log(`[USER_DATA] Project data loaded:`, projectData ? `Project ID: ${projectData.id}` : 'No project found')
-
     // Get user's software (chats) data
-    console.log(`[USER_DATA] Loading software data for project: ${projectData?.id || 'none'}`)
     const { data: softwareData } = await supabase
       .from('software')
       .select('id, title, demo_url, software_id, created_at')
       .eq('project_id', projectData?.id || '')
       .order('created_at', { ascending: false })
 
-    console.log(`[USER_DATA] Software data loaded: ${softwareData?.length || 0} items`)
 
     return NextResponse.json({
       project: projectData ? {

@@ -7,20 +7,16 @@ export async function POST(request: NextRequest) {
 
     const body = await request.json()
     const { title, prompt, projectId, userId } = body
-    console.log(`[SOFTWARE] Async generate request - User: ${userId}, Project: ${projectId}, Title: ${title}`)
 
     if (!userId) {
-      console.log(`[SOFTWARE] Generate failed - User ID missing`)
       return NextResponse.json({ error: 'User ID is required' }, { status: 400 })
     }
 
     if (!title || !prompt || !projectId) {
-      console.log(`[SOFTWARE] Generate failed - Missing required fields`)
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
     }
 
     // Get user's project to verify ownership
-    console.log(`[SOFTWARE] Verifying project ownership for project: ${projectId}`)
     const { data: project, error: projectError } = await supabase
       .from('projects')
       .select('*')
@@ -29,19 +25,14 @@ export async function POST(request: NextRequest) {
       .single()
 
     if (projectError || !project) {
-      console.log(`[SOFTWARE] Project verification failed:`, projectError?.message)
       return NextResponse.json({ error: 'Project not found' }, { status: 404 })
     }
 
     if (!project.v0_id) {
-      console.log(`[SOFTWARE] Project missing v0_id: ${projectId}`)
       return NextResponse.json({ error: 'Project does not have v0_id' }, { status: 400 })
     }
 
-    console.log(`[SOFTWARE] Project verified - v0_id: ${project.v0_id}`)
-
     // Create job record
-    console.log(`[SOFTWARE] Creating job record for v0 processing`)
     const { data: job, error: jobError } = await supabase
       .from('jobs')
       .insert({
@@ -63,11 +54,9 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Failed to create job' }, { status: 500 })
     }
 
-    console.log(`[SOFTWARE] Job record created - ID: ${job.id}`)
 
     // For now, simulate the job processing directly
     // TODO: Implement proper Supabase Queue integration
-    console.log(`[SOFTWARE] Job created, will be processed asynchronously: ${job.id}`)
 
     // Update job status to processing
     await supabase
@@ -90,7 +79,6 @@ export async function POST(request: NextRequest) {
       const { createClient } = await import('v0-sdk')
       const v0Client = createClient({ apiKey: v0ApiKey })
 
-      console.log(`[SOFTWARE] Creating v0 chat for project: ${project.v0_id}`)
       const chatResult = await v0Client.chats.create({
         projectId: project.v0_id,
         message: prompt,
@@ -103,13 +91,11 @@ export async function POST(request: NextRequest) {
 
       const maxAttempts = 10
       for (let attempt = 1; attempt <= maxAttempts; attempt++) {
-        console.log(`[SOFTWARE] Polling attempt ${attempt}/${maxAttempts}`)
 
         try {
           const completedChat = await v0Client.chats.getById({ chatId: chatResult.id })
           demoUrl = completedChat.latestVersion?.demoUrl
           assistantMessage = completedChat.messages?.find((msg: any) => msg.role === 'assistant')?.content
-          console.log(`[SOFTWARE] Poll result - Demo URL: ${demoUrl}, Message: ${assistantMessage?.substring(0, 100)}...`)
 
           // If we have a demo URL, we're done
           if (demoUrl) {
@@ -118,7 +104,6 @@ export async function POST(request: NextRequest) {
 
           // If we have an assistant message but no demo URL, v0 is asking for clarification
           if (assistantMessage && !demoUrl) {
-            console.log(`[SOFTWARE] V0 provided clarification message instead of demo URL`)
             break
           }
 
@@ -159,7 +144,6 @@ export async function POST(request: NextRequest) {
         throw new Error(`Failed to save software: ${softwareError.message}`)
       }
 
-      console.log(`[SOFTWARE] Software record created - ID: ${software.id}, hasDemoUrl: ${!!demoUrl}`)
 
       // Add user message
       await supabase
@@ -179,7 +163,6 @@ export async function POST(request: NextRequest) {
             role: 'assistant',
             content: assistantMessage
           })
-        console.log(`[SOFTWARE] Assistant message saved: ${assistantMessage.substring(0, 100)}...`)
       }
 
       // Update job as completed
@@ -199,7 +182,6 @@ export async function POST(request: NextRequest) {
         })
         .eq('id', job.id)
 
-      console.log(`[SOFTWARE] Software generation completed successfully: ${job.id}`)
       return NextResponse.json({
         success: true,
         jobId: job.id,

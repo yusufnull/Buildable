@@ -22,7 +22,6 @@ export function useOpenScadWorker() {
     const worker = new Worker(new URL('../workers/openscad.worker.ts', import.meta.url))
     workerRef.current = worker
     try {
-      console.log('[OpenSCAD Hook] initializing worker with origin', window.location.origin)
       worker.postMessage({ type: 'init', origin: window.location.origin })
     } catch {}
     return () => {
@@ -39,7 +38,6 @@ export function useOpenScadWorker() {
     return new Promise<{ blob: Blob; triangleCount: number; warnings: string[] }>((resolve, reject) => {
       const id = Math.random().toString(36).slice(2)
       const onMessage = (ev: MessageEvent<WorkerResponse>) => {
-        console.log('[OpenSCAD Hook] message received', ev.data?.id)
         const msg = ev.data
         if (!msg || msg.id !== id) return
         workerRef.current?.removeEventListener('message', onMessage)
@@ -63,7 +61,6 @@ export function useOpenScadWorker() {
         reject(new Error('OpenSCAD worker unavailable'))
         return
       }
-      console.log('[OpenSCAD Hook] posting compile request', { id })
       worker.addEventListener('message', onMessage)
       const req: WorkerRequest = { id, type: 'compile', scad, params }
       worker.postMessage(req)

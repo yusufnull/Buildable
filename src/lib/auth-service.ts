@@ -8,7 +8,6 @@ interface SessionData {
 export async function createSession(sessionData: SessionData) {
   // For now, we'll use a simple in-memory store
   // In production, you'd want to use Redis or a database
-  console.log('Session created:', sessionData)
   
   // Store session data (simplified implementation)
   if (typeof window !== 'undefined') {

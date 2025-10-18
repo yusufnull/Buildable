@@ -56,7 +56,6 @@ interface V0MessageResult {
 
 export async function createV0Project(data: V0ProjectData): Promise<V0ProjectResult> {
   try {
-    console.log(`[V0] Creating project: ${data.name}`)
     const v0ApiKey = process.env.V0_API_KEY
     
     if (!v0ApiKey) {
@@ -67,7 +66,6 @@ export async function createV0Project(data: V0ProjectData): Promise<V0ProjectRes
         name: data.name,
         description: data.description,
       }
-      console.log(`[V0] Mock project created: ${mockProject.id}`)
       return { project: mockProject }
     }
 
@@ -76,14 +74,11 @@ export async function createV0Project(data: V0ProjectData): Promise<V0ProjectRes
       apiKey: v0ApiKey,
     })
 
-    console.log(`[V0] Making API call to create project using SDK`)
     const result = await client.projects.create({
       name: data.name,
       description: data.description,
     })
 
-    console.log(`[V0] Project created successfully:`, result)
-    console.log(`[V0] Project ID: ${result.id}`)
 
     return {
       project: {
@@ -102,7 +97,6 @@ export async function createV0Project(data: V0ProjectData): Promise<V0ProjectRes
 
 export async function createV0Chat(data: V0ChatData): Promise<V0ChatResult> {
   try {
-    console.log(`[V0] Creating chat for project: ${data.projectId}`)
     const v0ApiKey = process.env.V0_API_KEY
     
     if (!v0ApiKey) {
@@ -110,7 +104,6 @@ export async function createV0Chat(data: V0ChatData): Promise<V0ChatResult> {
       // Mock response for development
       const mockChatId = `chat_${Date.now()}`
       const mockDemoUrl = `https://v0.dev/demo/${mockChatId}`
-      console.log(`[V0] Mock chat created: ${mockChatId}`)
       return { chatId: mockChatId, demoUrl: mockDemoUrl }
     }
 
@@ -119,11 +112,6 @@ export async function createV0Chat(data: V0ChatData): Promise<V0ChatResult> {
       apiKey: v0ApiKey,
     })
 
-    console.log(`[V0] Making API call to create chat using SDK`)
-    console.log(`[V0] Request parameters:`, {
-      projectId: data.projectId,
-      message: data.message
-    })
     
     const result = await withTimeout(
       client.chats.create({
@@ -135,8 +123,6 @@ export async function createV0Chat(data: V0ChatData): Promise<V0ChatResult> {
       110000 // 110 seconds timeout (just under 2 minutes)
     )
 
-    console.log(`[V0] Chat created successfully:`, result)
-    console.log(`[V0] Full result structure:`, JSON.stringify(result, null, 2))
     
     // Check if result is what we expect
     if (!result) {
@@ -148,16 +134,9 @@ export async function createV0Chat(data: V0ChatData): Promise<V0ChatResult> {
     
     // Handle different response types
     if ('id' in result) {
-        console.log(`[V0] Chat ID: ${result.id}`)
-        console.log(`[V0] Web URL (chat URL): ${result.webUrl}`)
-        console.log(`[V0] Latest Version exists: ${!!result.latestVersion}`)
         
         if (result.latestVersion) {
-          console.log(`[V0] Latest Version details:`, JSON.stringify(result.latestVersion, null, 2))
-          console.log(`[V0] Latest Version status: ${result.latestVersion.status}`)
-          console.log(`[V0] Demo URL (iframe URL): ${result.latestVersion.demoUrl}`)
         } else {
-          console.log(`[V0] No latestVersion available yet`)
         }
         
         // Extract latest assistant message if present
@@ -175,18 +154,15 @@ export async function createV0Chat(data: V0ChatData): Promise<V0ChatResult> {
         let demoUrl = result.latestVersion?.demoUrl
         const chatUrl = result.webUrl
 
-        console.log(`[V0] Mapped URLs - Demo: ${demoUrl}, Chat: ${chatUrl}`)
 
         // If no demoUrl yet, perform short server-side polling to wait until ready
         if (!demoUrl) {
-          console.log(`[V0] No demoUrl yet. Starting short polling for chat: ${result.id}`)
           const maxAttempts = 8
           for (let attempt = 1; attempt <= maxAttempts; attempt++) {
             await delay(1500)
             try {
               const refreshed: any = await client.chats.getById({ chatId: (result as any).id } as any)
               demoUrl = refreshed?.latestVersion?.demoUrl
-              console.log(`[V0] Poll attempt ${attempt}/${maxAttempts} - Demo URL: ${demoUrl}`)
               if (demoUrl) {
                 break
               }
@@ -200,7 +176,6 @@ export async function createV0Chat(data: V0ChatData): Promise<V0ChatResult> {
         if (!demoUrl) {
           // Check if v0 provided a clarification message instead of a demo URL
           if (assistantMessage) {
-            console.log(`[V0] No demo URL but v0 provided clarification message`)
             return {
               chatId: result.id,
               demoUrl: undefined, // No demo URL available yet
@@ -240,14 +215,12 @@ export async function createV0Chat(data: V0ChatData): Promise<V0ChatResult> {
 
 export async function sendV0Message(data: V0MessageData): Promise<V0MessageResult> {
   try {
-    console.log(`[V0] Sending message to chat: ${data.chatId}`)
     const v0ApiKey = process.env.V0_API_KEY
     
     if (!v0ApiKey) {
       console.warn(`[V0] V0_API_KEY not found, using mock response`)
       // Mock response for development
       const mockDemoUrl = `https://v0.dev/demo/${data.chatId}?updated=${Date.now()}`
-      console.log(`[V0] Mock message sent, demo URL: ${mockDemoUrl}`)
       return { demoUrl: mockDemoUrl }
     }
 
@@ -256,9 +229,6 @@ export async function sendV0Message(data: V0MessageData): Promise<V0MessageResul
       apiKey: v0ApiKey,
     })
 
-    console.log(`[V0] Making API call to send message using SDK`)
-    console.log(`[V0] - Chat ID: ${data.chatId}`)
-    console.log(`[V0] - Message: ${data.message}`)
     
     const result = await withTimeout(
       client.chats.sendMessage({
@@ -268,15 +238,9 @@ export async function sendV0Message(data: V0MessageData): Promise<V0MessageResul
       110000 // 110 seconds timeout (just under 2 minutes)
     )
 
-    console.log(`[V0] Message sent successfully:`, result)
-    console.log(`[V0] Full result structure:`, JSON.stringify(result, null, 2))
     
     // Handle different response types
     if ('id' in result) {
-      console.log(`[V0] Chat ID: ${result.id}`)
-      console.log(`[V0] Web URL (chat URL): ${result.webUrl}`)
-      console.log(`[V0] Demo URL (iframe URL): ${result.latestVersion?.demoUrl}`)
-      console.log(`[V0] Messages array:`, result.messages)
       
       // Extract the latest assistant message from the messages array
       let assistantMessage = undefined
@@ -286,7 +250,6 @@ export async function sendV0Message(data: V0MessageData): Promise<V0MessageResul
         if (assistantMessages.length > 0) {
           const latestAssistantMessage = assistantMessages[assistantMessages.length - 1]
           assistantMessage = latestAssistantMessage.content
-          console.log(`[V0] Latest assistant message content: ${assistantMessage}`)
         }
       }
       
@@ -296,8 +259,6 @@ export async function sendV0Message(data: V0MessageData): Promise<V0MessageResul
       const demoUrl = result.latestVersion?.demoUrl
       const chatUrl = result.webUrl
       
-      console.log(`[V0] Mapped URLs - Demo: ${demoUrl}, Chat: ${chatUrl}`)
-      console.log(`[V0] Assistant message: ${assistantMessage}`)
       
       return {
         demoUrl: demoUrl,

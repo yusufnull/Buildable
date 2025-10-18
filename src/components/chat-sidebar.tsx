@@ -40,8 +40,6 @@ export function ChatSidebar({ onLogout, onSendMessage }: ChatSidebarProps) {
   const mode = activeCreation?.mode || (activeCreation?.softwareData ? "software" : "hardware")
   const apiEndpoint = mode === "hardware" ? "/api/chat/hardware" : "/api/chat/software"
   
-  console.log(`[CHAT_SIDEBAR] Rendered - activeCreationId: ${activeCreationId}, mode: ${mode}, onSendMessage: ${!!onSendMessage}`)
-  console.log(`[CHAT_SIDEBAR] activeCreation:`, activeCreation)
 
   const prepareChatBody = () => {
     const safeCreation = activeCreation || {} as Partial<Creation>
