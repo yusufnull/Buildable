@@ -93,25 +93,6 @@ This project follows strict development principles:
 - Clear user feedback
 - Actionable error messages
 
-## API Integration Ready
-
-The application is structured to integrate with:
-
-- **adamcad API**: 3D hardware modeling
-- **v0 API**: Software generation and chat
-- **Perplexity/SONAR**: Business analysis reports
-- **Stripe**: Payment processing
-- **Supabase**: Authentication and data persistence
-
-## Database Schema
-
-The application is designed to work with the provided database schema including:
-- User management
-- Project storage
-- Software prototypes
-- Chat messages
-- Credit system
-- Job processing
 
 ## Development
 
@@ -137,9 +118,6 @@ The application is designed to work with the provided database schema including:
 4. Ensure transparent error handling
 5. Test all functionality
 
-## License
-
-This project is private and proprietary.
 
 ---
 
