@@ -59,7 +59,6 @@ export async function createV0Project(data: V0ProjectData): Promise<V0ProjectRes
     const v0ApiKey = process.env.V0_API_KEY
     
     if (!v0ApiKey) {
-      console.warn(`[V0] V0_API_KEY not found, using mock response`)
       // Mock response for development
       const mockProject = {
         id: `v0_${Date.now()}`,
@@ -100,7 +99,6 @@ export async function createV0Chat(data: V0ChatData): Promise<V0ChatResult> {
     const v0ApiKey = process.env.V0_API_KEY
     
     if (!v0ApiKey) {
-      console.warn(`[V0] V0_API_KEY not found, using mock response`)
       // Mock response for development
       const mockChatId = `chat_${Date.now()}`
       const mockDemoUrl = `https://v0.dev/demo/${mockChatId}`
@@ -199,7 +197,6 @@ export async function createV0Chat(data: V0ChatData): Promise<V0ChatResult> {
         }
     } else {
       // Handle stream response
-      console.log(`[V0] Stream response received`)
       return {
         chatId: `stream_${Date.now()}`,
         demoUrl: `https://v0.dev/demo/stream_${Date.now()}`
@@ -218,7 +215,6 @@ export async function sendV0Message(data: V0MessageData): Promise<V0MessageResul
     const v0ApiKey = process.env.V0_API_KEY
     
     if (!v0ApiKey) {
-      console.warn(`[V0] V0_API_KEY not found, using mock response`)
       // Mock response for development
       const mockDemoUrl = `https://v0.dev/demo/${data.chatId}?updated=${Date.now()}`
       return { demoUrl: mockDemoUrl }
@@ -267,7 +263,6 @@ export async function sendV0Message(data: V0MessageData): Promise<V0MessageResul
       }
     } else {
       // Handle stream response or other types
-      console.log(`[V0] Stream response received`)
       return {
         demoUrl: `https://v0.dev/demo/${data.chatId}`,
         chatUrl: `https://v0.app/chat/${data.chatId}`,

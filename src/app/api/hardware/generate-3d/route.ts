@@ -132,7 +132,6 @@ Generate the JSON now. Output only the JSON object.`,
     }
 
     // Log the parsed JSON for testing
-    console.log("[3D] Generated JSON data:", JSON.stringify(parsed, null, 2))
 
     // Resolve target project id (UI may send a non-UUID creation id)
     const isUuid = (value: string | undefined): boolean => {

@@ -48,7 +48,6 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Failed to create job" }, { status: 500 })
     }
 
-    console.log(`[HARDWARE] Job created successfully: ${job.id} for ${kind}`)
 
     // Update job status to pending (will be processed by Edge Function)
     const { error: updateError } = await supabase

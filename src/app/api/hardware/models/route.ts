@@ -60,7 +60,6 @@ export async function POST(request: NextRequest) {
 
     if (HARDWARE_FUNCTION_ENDPOINT && SERVICE_ROLE_KEY) {
       try {
-        console.log(`[HARDWARE] Triggering hardware-processor function at ${HARDWARE_FUNCTION_ENDPOINT}`)
         const functionResponse = await fetch(HARDWARE_FUNCTION_ENDPOINT, {
           method: "POST",
           headers: {
@@ -72,7 +71,6 @@ export async function POST(request: NextRequest) {
         
         if (functionResponse.ok) {
           const result = await functionResponse.json()
-          console.log(`[HARDWARE] Successfully triggered hardware-processor:`, result)
         } else {
           console.error(`[HARDWARE] Hardware-processor function returned ${functionResponse.status}:`, await functionResponse.text())
         }

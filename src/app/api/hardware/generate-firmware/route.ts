@@ -54,7 +54,6 @@ Generate complete firmware code for this hardware project.`,
         })
         return text
       } catch (error: any) {
-        console.log("Using fallback content due to API limitation")
         throw error
       }
     }

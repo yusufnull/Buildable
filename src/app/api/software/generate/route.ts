@@ -125,7 +125,6 @@ export async function POST(request: NextRequest) {
         throw new Error('No demo URL or clarification message from v0 after polling')
       }
 
-      console.log(`[SOFTWARE] Final result: hasDemoUrl=${hasDemoUrl}, hasClarification=${hasClarification}`)
 
       // Create software record (handles both scenarios: with and without demo URL)
       const { data: software, error: softwareError } = await supabase

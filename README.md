@@ -1,6 +1,6 @@
-# LogicLab - AI-Powered Product Creation Platform
+# Buildable - AI-Powered Product Creation Platform
 
-LogicLab is an AI-powered product creation platform that allows non-technical users to build hardware or software prototypes, run business analysis, and generate 3D visualizations or working demo apps without coding.
+Buildables is an AI-powered product creation platform that allows non-technical users to build hardware or software prototypes, run business analysis, and generate 3D visualizations or working demo apps without coding.
 
 ## Features
 

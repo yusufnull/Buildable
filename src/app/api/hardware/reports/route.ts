@@ -96,7 +96,6 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    console.log(`[HARDWARE] Retrieved ${reports?.length || 0} hardware projects for project ${projectId}`)
 
     return NextResponse.json({
       success: true,

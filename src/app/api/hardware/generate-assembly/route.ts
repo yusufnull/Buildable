@@ -35,7 +35,6 @@ Generate comprehensive assembly instructions and parts list for this hardware pr
         })
         return text
       } catch (error: any) {
-        console.log("Using fallback content due to API limitation")
         throw error
       }
     }
