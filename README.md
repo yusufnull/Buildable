@@ -6,15 +6,13 @@ Buildables is an AI-powered product creation platform that allows non-technical 
 
 ### 🚀 Core Functionality
 - **Hardware Prototyping**: Generate 3D models and component lists using AI
-- **Software Development**: Build working demo apps without coding
-- **Business Analysis**: AI-powered market research and business insights
 - **Unified Dashboard**: Single workspace for all project management
 
 ### 🎨 Design System
 - **Modern UI**: Clean, professional interface with orange-red gradient branding
 - **Responsive Design**: Works seamlessly on desktop and mobile
 - **Animated Elements**: Subtle animations and hover effects
-- **Dark Mode Support**: Built-in dark/light theme switching
+
 
 ### 🔧 Technical Stack
 - **Frontend**: Next.js 15 with App Router
