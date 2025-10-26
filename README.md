@@ -65,9 +65,9 @@ npm install
 npm run dev
 ```
 
-4. Open [http://localhost:3000](http://localhost:3000) in your browser.
-
-Buildables link: buildables.app
+4. Open [https://www.buildables.app] in your browser.
+    
+OR Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ## Core Principles
 
